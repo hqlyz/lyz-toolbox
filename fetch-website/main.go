@@ -1,8 +1,9 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -17,6 +19,7 @@ import (
 
 var (
 	urlProtocol = "http://"
+	rootDir = ""
 )
 
 type staticFile struct {
@@ -40,7 +43,7 @@ func main() {
 	}
 
 	// 新建文件夹存储所有文件
-	rootDir := u.Host
+	rootDir = u.Host
 	if !fileExists(rootDir) {
 		err = os.Mkdir(rootDir, 0666)
 		if err != nil {
@@ -67,9 +70,10 @@ func main() {
 		log.Fatalf("Fetch website failed with status: %s", resp.Status)
 	}
 
-	var buf = bufio.NewReader(resp.Body)
+	var buf bytes.Buffer
+	tee := io.TeeReader(resp.Body, &buf)
 
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	doc, err := goquery.NewDocumentFromReader(tee)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -92,16 +96,9 @@ func main() {
 				}
 			}
 		}
-	})
+	})	
 
-	log.Println("Need to be downloaded...")
-	for _, s := range staticFiles {
-		log.Println(s.fileURL, s.filePath)
-	}
-
-	buf.Reset(resp.Body)
-	contentBytes, err := ioutil.ReadAll(buf)
-	log.Println("content length: ", len(contentBytes))
+	contentBytes, err := ioutil.ReadAll(&buf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -109,20 +106,58 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("Need to be downloaded...")
+	var wg sync.WaitGroup
+	wg.Add(len(staticFiles))
+	for _, s := range staticFiles {
+		log.Println(s.fileURL, path.Join(rootDir, s.filePath))
+		go downloadStaticFile(s.fileURL, path.Join(rootDir, s.filePath), &wg)
+	}
+	wg.Wait()
+	log.Println("All done.")
 }
 
 func getStaticFilePath(protocol string, u *url.URL, src string) string {
 	if len(src) == 0 {
 		return ""
 	}
-	if src[0] == '/' {
-		return path.Join(protocol, u.Host, src)
+	if len(src) >= 4 && src[:4] == "http" {
+		return ""
 	}
-	return path.Join(protocol, u.Host, u.Path, src)
+	if src[0] == '/' {
+		return protocol + path.Join(u.Host, src)
+	}
+	return protocol + path.Join(u.Host, u.Path, src)
 }
 
-func downloadStaticFile(fileURL string, filePath string) {
+func downloadStaticFile(fileURL string, filePath string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if len(filePath) == 0 {
+		return
+	}
+	resp, err := http.Get(fileURL)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer resp.Body.Close()
 
+	fp := filePath
+	dir := path.Dir(fp)
+	if !fileExists(dir) {
+		err = os.MkdirAll(dir, 0666)
+		if err != nil {
+			return
+		}
+	}
+	file, err := os.Create(fp)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer file.Close()
+	io.Copy(file, resp.Body)
 }
 
 func fileExists(path string) bool {

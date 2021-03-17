@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>宝光阁 - 做您最贴心的在线工具箱</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/mystyle.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="App">
+        <link rel="stylesheet" href="/static/css/mystyle.css">
+<div class="header-area" style="border-bottom: solid 1px rgb(224,224,224);">
+	<div class="container">
+		<nav class="navbar navbar-expand-lg navbar-light">
+			<a class="navbar-brand" id="web_home" href="/"
+				style="font-size: 1.5rem;line-height: 2.2rem;color: #202020 !important;">宝光阁</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+				aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item">
+						<a class="nav-link" id="nav_home" href="/">首页</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+							data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							简体中文						</a>
+						<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('zh-cn')" id="lang_zh">简体中文</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('en-us')" id="lang_en">English</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('ja')" id="lang_ja">日本語</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('de')" id="lang_de">Deutsch</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('fr')" id="lang_fr">Français</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('es')" id="lang_es">Español</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('it')" id="lang_it">Italiano</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('pl')" id="lang_pl">Polski</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('pt')" id="lang_pt">Português</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('ru')" id="lang_ru">Русский</a>
+							<a class="dropdown-item" href="javascript:void(0);" onclick="changeLang('sv')" id="lang_sv">Svenska</a>
+						</div>
+					</li>
+				</ul>
+				<!-- <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Tools name" aria-label="Search">
+                <a class="btn btn-light" href="javascript:(void);" id="search">Search</a>
+              </form> -->
+			</div>
+		</nav>
+	</div>
+</div>
+<script src="/static/js/jquery.min.js"></script>
+<script>
+	var curLang = window.location.pathname.split("/")[1];
+	var href = $("#web_home").attr("href");
+	$("#web_home").attr("href", href + curLang + "/");
+	$("#nav_home").attr("href", href + curLang + "/");
+	function changeLang(lang) {
+		window.location.href = window.location.href.replace(curLang, lang);
+		return false;
+	}
+</script>
+
+        <div class="main-content">
+            <div class="container">
+                <div class="row cates-container">
+                    <div class="col-lg-12 d-flex justify-content-center" id="cate_container">
+                        <ul id="categories">
+                            <li class="active" data-filter="media" id="cate_media">
+                                多媒体                            </li>
+                            <li data-filter="conv" id="cate_conversion">
+                                单位转换                            </li>
+                            <li data-filter="crypto" id="cate_crypto">
+                                加密解密                            </li>
+                            <li data-filter="others" id="cate_others">
+                                其他                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="filter-container">
+                    <div class="filtr-item" data-category="media" id="item_media">
+                        <div class="section-title">
+                            多媒体                        </div>
+                        <hr class="mb-3">
+                        <div class="row no-margin items-container">
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="media/downloadvideos">
+                                    <div class="icon-box icon-box-red">
+                                        <div class="icon">
+                                            <i class="fa fa-file-video-o fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>下载视频</h6>
+                                        <p>下载包括Youtube，Bilibili等众多视频网站的视频，可选择不同的视频质量进行下载</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="media/imagefiltering">
+                                    <div class="icon-box icon-box-red">
+                                        <div class="icon">
+                                            <i class="fa fa-file-image-o fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>图片滤镜特效</h6>
+                                        <p>可对本地图片进行各种滤镜操作，支持20多种滤镜效果</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="media/subtitles">
+                                    <div class="icon-box icon-box-red">
+                                        <div class="icon">
+                                            <i class="fa fa-file-text-o fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>下载字幕/弹幕/歌词</h6>
+                                        <p>下载在线视频的字幕/弹幕/歌词，支持Youtube、Bilibili等网站</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filtr-item" data-category="conv" id="item_conv">
+                        <div class="section-title">
+                            单位转换                        </div>
+                        <hr class="mb-3">
+                        <div class="row no-margin items-container">
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="conversion/length">
+                                    <div class="icon-box icon-box-blue">
+                                        <div class="icon">
+                                            <i class="fa fa-arrows-h fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>长度转换</h6>
+                                        <p>在各种长度单位之间进行转换</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="conversion/time">
+                                    <div class="icon-box icon-box-blue">
+                                        <div class="icon">
+                                            <i class="fa fa-clock-o fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>时间转换</h6>
+                                        <p>对时间和时间戳进行转换，同时列出了一些如何获取时间戳的方法</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="conversion/computer">
+                                    <div class="icon-box icon-box-blue">
+                                        <div class="icon">
+                                            <i class="fa fa-laptop fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>计算机单位转换</h6>
+                                        <p>在各种计算机容量单位之间进行转换</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filtr-item" data-category="crypto" id="item_crypto">
+                        <div class="section-title">
+                            加密解密                        </div>
+                        <hr class="mb-3">
+                        <div class="row no-margin items-container">
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="crypto/aes">
+                                    <div class="icon-box icon-box-orange">
+                                        <div class="icon">
+                                            <i class="fa fa-lock fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>AES加密&解密</h6>
+                                        <p>将输入的文字用AES进行加密或者解密</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="crypto/rabbit">
+                                    <div class="icon-box icon-box-orange">
+                                        <div class="icon">
+                                            <i class="fa fa-lock fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>Rabbit加密&解密</h6>
+                                        <p>将输入的文字用Rabbit进行加密或者解密</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="crypto/base64">
+                                    <div class="icon-box icon-box-orange">
+                                        <div class="icon">
+                                            <i class="fa fa-lock fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>Base64编码&解码</h6>
+                                        <p>将输入的文字用Base64进行编码或者解码</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="crypto/md5">
+                                    <div class="icon-box icon-box-orange">
+                                        <div class="icon">
+                                            <i class="fa fa-lock fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>MD5散列值</h6>
+                                        <p>将输入的文字用MD5计算散列值，结果将不可逆</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="crypto/sha">
+                                    <div class="icon-box icon-box-orange">
+                                        <div class="icon">
+                                            <i class="fa fa-lock fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>SHA散列值</h6>
+                                        <p>将输入的文字用SHA计算散列值，结果将不可逆</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="crypto/hmac">
+                                    <div class="icon-box icon-box-orange">
+                                        <div class="icon">
+                                            <i class="fa fa-lock fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>HMAC散列值</h6>
+                                        <p>将输入的文字用HMAC计算散列值，结果将不可逆</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filtr-item" data-category="others" id="item_others">
+                        <div class="section-title">
+                            其他                        </div>
+                        <hr class="mb-3">
+                        <div class="row no-margin items-container">
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="others/flyingmsg">
+                                    <div class="icon-box icon-box-purple">
+                                        <div class="icon">
+                                            <i class="fa fa-paper-plane-o fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>飞鸽传书</h6>
+                                        <p>发送消息后可在任意平台接收该消息文本</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="others/passwordgen">
+                                    <div class="icon-box icon-box-purple">
+                                        <div class="icon">
+                                            <i class="fa fa-eye-slash fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>密码生成器</h6>
+                                        <p>可自定义选用数字、字母、特殊符号等字符随机生成密码</p>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6 d-flex align-items-stretch tools-item2" data-aos="zoom-in"
+                                data-aos-delay="100">
+                                <a href="#">
+                                    <div class="icon-box icon-box-purple">
+                                        <div class="icon">
+                                            <i class="fa fa-smile-o fa-2x" aria-hidden="true"></i>
+                                        </div>
+                                        <h6>更多</h6>
+                                        <p>更多工具正在开发中...</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="myfooter-wrapper" style="padding: 1.2rem 0;margin-top: 1.5rem;width: 100%;border-top: solid 1px rgb(224,224,224);">
+    <footer id="myfooter" style="text-align: center;">
+        <div class="container">
+            <div>
+                &copy; 2020 宝光阁 版权所有. 
+            </div>
+        </div>
+    </footer>
+</div>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8EVWD5SQ6M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8EVWD5SQ6M');
+</script>
+    </div>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/jquery.filterizr.min.js"></script>
+    <script>
+        $(function () {
+            $('#categories li').on('click', function () {
+                $(this).toggleClass('active').siblings().removeClass('active');
+            });
+        });
+        document.querySelector("#cate_media").onclick = function () {
+            // document.querySelector("#item_media").scrollIntoView(false);
+            $("html,body").animate({ scrollTop: $("#item_media").offset().top - 85 }, 500);
+        }
+        document.querySelector("#cate_conversion").onclick = function () {
+            // document.querySelector("#item_conv").scrollIntoView(false);
+            $("html,body").animate({ scrollTop: $("#item_conv").offset().top - 85 }, 500);
+        }
+        document.querySelector("#cate_crypto").onclick = function () {
+            // document.querySelector("#item_crypto").scrollIntoView(false);
+            $("html,body").animate({ scrollTop: $("#item_crypto").offset().top - 85 }, 500);
+        }
+        document.querySelector("#cate_others").onclick = function () {
+            // document.querySelector("#item_others").scrollIntoView(false);
+            $("html,body").animate({ scrollTop: $("#item_others").offset().top - 85 }, 500);
+        }
+    </script>
+</body>
+
+</html>
