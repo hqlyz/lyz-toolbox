@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
+	"html"
 	"io"
 	"io/ioutil"
 	"log"
@@ -19,12 +19,13 @@ import (
 
 var (
 	urlProtocol = "http://"
-	rootDir = ""
+	rootDir     = ""
 )
 
 type staticFile struct {
 	fileURL  string
 	filePath string
+	slash    bool
 }
 
 func main() {
@@ -70,10 +71,10 @@ func main() {
 		log.Fatalf("Fetch website failed with status: %s", resp.Status)
 	}
 
-	var buf bytes.Buffer
-	tee := io.TeeReader(resp.Body, &buf)
+	// var buf bytes.Buffer
+	// tee := io.TeeReader(resp.Body, &buf)
 
-	doc, err := goquery.NewDocumentFromReader(tee)
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,26 +84,34 @@ func main() {
 	doc.Find("link, script").Each(func(i int, s *goquery.Selection) {
 		href, exist := s.Attr("href")
 		if exist {
-			fileURL := getStaticFilePath(urlProtocol, u, href)
+			fileURL, slash := getStaticFileURL(urlProtocol, u, href)
 			if fileURL != "" {
-				staticFiles = append(staticFiles, staticFile{fileURL: fileURL, filePath: href})
+				staticFiles = append(staticFiles, staticFile{fileURL: fileURL, filePath: href, slash: slash})
+				if slash {
+					s.SetAttr("href", href[1:])
+				}
 			}
 		} else {
 			src, exist := s.Attr("src")
 			if exist {
-				fileURL := getStaticFilePath(urlProtocol, u, src)
+				fileURL, slash := getStaticFileURL(urlProtocol, u, src)
 				if fileURL != "" {
-					staticFiles = append(staticFiles, staticFile{fileURL: fileURL, filePath: src})
+					staticFiles = append(staticFiles, staticFile{fileURL: fileURL, filePath: src, slash: slash})
+					if slash {
+						s.SetAttr("src", src[1:])
+					}
 				}
 			}
 		}
-	})	
+	})
 
-	contentBytes, err := ioutil.ReadAll(&buf)
+	finalDoc, err := doc.Html()
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
-	err = ioutil.WriteFile(path.Join(rootDir, "index.html"), contentBytes, 0666)
+	finalDoc = html.UnescapeString(finalDoc)
+
+	err = ioutil.WriteFile(path.Join(rootDir, "index.html"), []byte(finalDoc), 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -118,17 +127,20 @@ func main() {
 	log.Println("All done.")
 }
 
-func getStaticFilePath(protocol string, u *url.URL, src string) string {
-	if len(src) == 0 {
-		return ""
-	}
-	if len(src) >= 4 && src[:4] == "http" {
-		return ""
+func getStaticFileURL(protocol string, u *url.URL, src string) (fileURL string, slash bool) {
+	if len(src) == 0 || (len(src) >= 4 && src[:4] == "http") {
+		fileURL = ""
+		slash = false
+		return
 	}
 	if src[0] == '/' {
-		return protocol + path.Join(u.Host, src)
+		fileURL = protocol + path.Join(u.Host, src)
+		slash = true
+		return
 	}
-	return protocol + path.Join(u.Host, u.Path, src)
+	fileURL = protocol + path.Join(u.Host, u.Path, src)
+	slash = false
+	return
 }
 
 func downloadStaticFile(fileURL string, filePath string, wg *sync.WaitGroup) {
