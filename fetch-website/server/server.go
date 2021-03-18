@@ -36,13 +36,20 @@ type staticFile struct {
 type Server struct {
 	taskList []string
 	Ctx      context.Context
+	cancel   context.CancelFunc
+	taskNum  int // Only used when running once
+	runOnce  bool
+	mu       sync.Mutex
 }
 
 // New function construct a new Server instance
-func New(ctx context.Context) *Server {
+func New(runOnce bool) *Server {
+	ctx, f := context.WithCancel(context.Background())
 	return &Server{
 		taskList: []string{},
 		Ctx:      ctx,
+		cancel:   f,
+		runOnce:  runOnce,
 	}
 }
 
@@ -62,6 +69,9 @@ func (s *Server) dequeue() string {
 
 // Run function means server is going to handle processes
 func (s *Server) Run() {
+	if s.runOnce {
+		s.taskNum = len(s.taskList)
+	}
 	go s.handleProcess()
 }
 
@@ -69,6 +79,11 @@ func (s *Server) handleProcess() {
 	for {
 		webURL := s.dequeue()
 		if webURL == "" {
+			if s.runOnce && s.taskNum == 0 {
+				log.Println("All done.")
+				s.cancel()
+				return
+			}
 			time.Sleep(200 * time.Millisecond)
 			continue
 		}
@@ -78,6 +93,14 @@ func (s *Server) handleProcess() {
 }
 
 func (s *Server) downloadWebsite(webURL string) {
+	if s.runOnce {
+		defer func() {
+			s.mu.Lock()
+			s.taskNum--
+			s.mu.Unlock()
+		}()
+	}
+
 	if strings.Contains(webURL, "https") {
 		urlProtocol = "https://"
 	}
@@ -156,7 +179,7 @@ func (s *Server) downloadWebsite(webURL string) {
 	}
 	finalDoc = html.UnescapeString(finalDoc)
 
-	/* 直接保存原始文件 */
+	/* Save file without compressing */
 	// err = ioutil.WriteFile(path.Join(rootDir, "index.html"), []byte(finalDoc), 0666)
 	// if err != nil {
 	// 	log.Fatal(err)
@@ -195,7 +218,7 @@ func (s *Server) downloadStaticFile(fileURL string, rootDir string, filePath str
 	}
 	defer resp.Body.Close()
 
-	/* 直接保存原始文件 */
+	/* Save file without compressing */
 	// fp := path.Join(rootDir, filePath)
 	// dir := path.Dir(fp)
 	// err = createFolder(dir, 0666)

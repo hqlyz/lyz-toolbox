@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fetch-website/server"
 	"fmt"
 	"log"
@@ -21,7 +20,7 @@ func main() {
 	}
 	webURL := os.Args[1]
 
-	server := server.New(context.Background())
+	server := server.New(runOnce)
 	server.Enqueue(webURL)
 	server.Run()
 

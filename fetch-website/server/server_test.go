@@ -1,12 +1,11 @@
 package server
 
 import (
-	"context"
 	"testing"
 )
 
 func TestQueueTask(t *testing.T) {
-	server := New(context.Background())
+	server := New(true)
 	server.Enqueue("one")
 	server.Enqueue("two")
 	server.Enqueue("three")
