@@ -1,10 +1,10 @@
 package server
 
 import (
+	"archive/zip"
 	"context"
 	"html"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -35,14 +35,14 @@ type staticFile struct {
 // Server object is going to download website
 type Server struct {
 	taskList []string
-	Ctx context.Context
+	Ctx      context.Context
 }
 
 // New function construct a new Server instance
 func New(ctx context.Context) *Server {
 	return &Server{
 		taskList: []string{},
-		Ctx: ctx,
+		Ctx:      ctx,
 	}
 }
 
@@ -152,22 +152,36 @@ func (s *Server) downloadWebsite(webURL string) {
 	}
 	finalDoc = html.UnescapeString(finalDoc)
 
-	err = ioutil.WriteFile(path.Join(rootDir, "index.html"), []byte(finalDoc), 0666)
+	/* 保存到文件 */
+	// err = ioutil.WriteFile(path.Join(rootDir, "index.html"), []byte(finalDoc), 0666)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	zipName := rootDir + ".zip"
+	zipFile, err := os.Create(zipName)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Create zip writer of '%s' failed: %v\n", zipName, err)
+		return
 	}
+	defer zipFile.Close()
+
+	zipWriter := zip.NewWriter(zipFile)
+	defer zipWriter.Close()
+
+	archiveFile(zipWriter, "index.html", strings.NewReader(finalDoc))
 
 	log.Println("Need to be downloaded...")
 	var wg sync.WaitGroup
 	wg.Add(len(staticFiles))
 	for _, sf := range staticFiles {
 		log.Println(sf.fileURL, path.Join(rootDir, sf.filePath))
-		go s.downloadStaticFile(sf.fileURL, path.Join(rootDir, sf.filePath), &wg)
+		go s.downloadStaticFile(sf.fileURL, rootDir, sf.filePath, &wg, zipWriter)
 	}
 	wg.Wait()
 }
 
-func (s *Server) downloadStaticFile(fileURL string, filePath string, wg *sync.WaitGroup) {
+func (s *Server) downloadStaticFile(fileURL string, rootDir string, filePath string, wg *sync.WaitGroup, w *zip.Writer) {
 	defer wg.Done()
 	if len(filePath) == 0 {
 		return
@@ -179,20 +193,23 @@ func (s *Server) downloadStaticFile(fileURL string, filePath string, wg *sync.Wa
 	}
 	defer resp.Body.Close()
 
-	fp := filePath
-	dir := path.Dir(fp)
-	err = createFolder(dir, 0666)
-	if err != nil {
-		return
-	}
+	/* 保存到文件 */
+	// fp := path.Join(rootDir, filePath)
+	// dir := path.Dir(fp)
+	// err = createFolder(dir, 0666)
+	// if err != nil {
+	// 	return
+	// }
 
-	file, err := os.Create(fp)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	defer file.Close()
-	io.Copy(file, resp.Body)
+	// file, err := os.Create(fp)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return
+	// }
+	// defer file.Close()
+	// io.Copy(file, resp.Body)
+
+	archiveFile(w, filePath, resp.Body)
 }
 
 func fileExists(path string) bool {
@@ -227,4 +244,13 @@ func createFolder(dir string, perm os.FileMode) error {
 		return os.MkdirAll(dir, 0666)
 	}
 	return nil
+}
+
+func archiveFile(w *zip.Writer, path string, r io.Reader) {
+	out, err := w.Create(path)
+	if err != nil {
+		log.Printf("Create zip content file failed: %v\n", err)
+		return
+	}
+	io.Copy(out, r)
 }
