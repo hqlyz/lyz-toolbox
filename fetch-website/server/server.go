@@ -103,11 +103,13 @@ func (s *Server) downloadWebsite(webURL string) {
 	// construct a http request
 	req, err := http.NewRequest("GET", webURL, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Construct a new request failed: %v\n", err)
+		return
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Http client request failed: %v\n", err)
+		return
 	}
 	defer resp.Body.Close()
 
@@ -117,7 +119,8 @@ func (s *Server) downloadWebsite(webURL string) {
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Goquery create new document faield: %v\n", err)
+		return
 	}
 
 	staticFiles := []staticFile{}
@@ -148,11 +151,12 @@ func (s *Server) downloadWebsite(webURL string) {
 
 	finalDoc, err := doc.Html()
 	if err != nil {
-		log.Print(err)
+		log.Printf("Goquery export html literal failed: %v\n", err)
+		return
 	}
 	finalDoc = html.UnescapeString(finalDoc)
 
-	/* 保存到文件 */
+	/* 直接保存原始文件 */
 	// err = ioutil.WriteFile(path.Join(rootDir, "index.html"), []byte(finalDoc), 0666)
 	// if err != nil {
 	// 	log.Fatal(err)
@@ -171,11 +175,9 @@ func (s *Server) downloadWebsite(webURL string) {
 
 	archiveFile(zipWriter, "index.html", strings.NewReader(finalDoc))
 
-	log.Println("Need to be downloaded...")
 	var wg sync.WaitGroup
 	wg.Add(len(staticFiles))
 	for _, sf := range staticFiles {
-		log.Println(sf.fileURL, path.Join(rootDir, sf.filePath))
 		go s.downloadStaticFile(sf.fileURL, rootDir, sf.filePath, &wg, zipWriter)
 	}
 	wg.Wait()
@@ -193,7 +195,7 @@ func (s *Server) downloadStaticFile(fileURL string, rootDir string, filePath str
 	}
 	defer resp.Body.Close()
 
-	/* 保存到文件 */
+	/* 直接保存原始文件 */
 	// fp := path.Join(rootDir, filePath)
 	// dir := path.Dir(fp)
 	// err = createFolder(dir, 0666)
